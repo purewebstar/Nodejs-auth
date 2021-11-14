@@ -1,0 +1,19 @@
+// Create user account
+POST http://localhost:4000/register
+Content-Type: application/json
+
+{
+    "username": "abrilo",
+    "password:": "123"
+}
+
+###
+POST http://localhost:4000/login
+Content-Type: application/json
+
+{
+    "username": "abrilo",
+    "password": "123"
+}
+
+###
