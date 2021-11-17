@@ -45,7 +45,7 @@ server.post('/register', async(req,res)=>{
 
 server.put('/renew/access-token', async(req, res)=>{
     const refreshToken = req.body.token;
-    if(!refreshToken) return res.status(404).json({message: 'Unauthorized', status: false});
+    if(!refreshToken) return res.status(401).json({message: 'Unauthorized', status: false});
     const decoded = jwt.verify(refreshToken, process.env.SECRET_KEY);
     const result = await User.findById({_id: decoded.payload.user_id}, {new:true});
     const payload = {user_id: result._id};
