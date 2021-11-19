@@ -62,12 +62,11 @@ server.put('/renew/access-token', async(req, res)=>{
 
 server.get('/user', passport.authenticate('jwt', {session: false}), async(req, res)=>{
     const user_id = req.user.payload.user_id;
-    try{
-        const result = await User.findById({_id: user_id}, {new:true});
-        return res.status(200).json({message: 'Authorized', user: result})
-    }catch(err){
-        return res.status(500).json({message: err.message})
-    }
+    await User.findOne({_id: user_id},function(err, user){
+        if(err) return res.status(400).json({message: err.message, status:false})
+        else if(!user) return res.status(404).json({message: "Not Found!", status:false})
+        else return res.status(200).json({user: user,status:true})
+    })
 });
 
 server.post('/refresh-token', async(req, res)=>{
