@@ -32,13 +32,15 @@ server.use(passport.initialize());
 initHeaderPassport(passport);
 
 server.post('/register', async(req,res)=>{
-    const {username, password} = req.body;
+    const {username, password, first_name, last_name} = req.body;
     const hashedPassword = await bcrypt.hash(password, 10)
     const result = await User.findOne({username: username}, {returnOriginal: true})
     if(!result){
         const newUser = new User({
             username: username,
-            password: hashedPassword
+            password: hashedPassword,
+            first_name: first_name,
+            last_name: last_name,
         });
         await newUser.save({new:true}, async(err,success)=>{
             if(err) return res.status(400).json({message: err.message})
