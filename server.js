@@ -20,7 +20,12 @@ then(() => console.log("Connected to mongoDb"))
 
 server.use(express.json())
 server.use(express.urlencoded({extended: true}));
-server.use(cors());
+const corsOptions ={
+    origin: `http://localhost:3000`, 
+    credentials: true,           
+    optionSuccessStatus: 200
+  }
+server.use(cors(corsOptions))
 server.use(cookieParser());
 server.use(passport.initialize());
 //server.use(passport.session());
@@ -57,11 +62,23 @@ server.get('/user', passport.authenticate('jwt', {session: false}), async(req, r
     const user_id = req.user.payload.user_id;
     try{
         const result = await User.findById({_id: user_id}, {new:true});
-        res.json({message: result})
+        return res.status(200).json({message: 'Authorized', user: result})
     }catch(err){
-        res.status(500).json({message: err.message})
+        return res.status(500).json({message: err.message})
     }
 });
+
+server.post('/refresh-token', async(req, res)=>{
+    const refreshToken = req.body.token;
+    if(!refreshToken) return res.status(403).json({message: 'Forbidden', status: false});
+    const decoded = jwt.verify(refreshToken, process.env.SECRET_KEY, (err, success)=>{
+        if(err) return res.status(500).json({message: err.message});
+        else if(success){
+            return res.status(200).json({message: 'Authorized',status:true});
+        }
+    });
+    
+})
 
 server.post('/login', async(req,res)=>{
    const {username, password} = req.body;
